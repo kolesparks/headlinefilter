@@ -14,8 +14,6 @@ export async function scrapeNews(topic: NewsTopic) {
         render_js: true,
     });
 
-    await Bun.file('raw-news.html').write(html)
-
     return parseNews(html);
 }
 

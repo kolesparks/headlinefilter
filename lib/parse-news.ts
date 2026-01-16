@@ -1,6 +1,5 @@
 
 import * as cheerio from "cheerio";
-import { join } from "node:path";
 
 
 export type NewsArticle = {
@@ -17,8 +16,6 @@ export function parseNews(html: string) {
 
     const $ = cheerio.load(cleanedHtml);
     const articles: NewsArticle[] = [];
-
-    const header = $("h1");
 
     $("a").each((_, element) => {
         const $article = $(element);
@@ -52,7 +49,7 @@ export function parseNews(html: string) {
         articles.push({
             source,
             linkText,
-            linkHref: join("https://news.google.com", links.get(rawLinkText) || ""),
+            linkHref: links.has(rawLinkText) ? `https://news.google.com/${links.get(rawLinkText)?.replace('./', '')}` : "",
             timestamp,
             relativeTime,
             author,
@@ -158,11 +155,11 @@ function cleanHtml(html: string) {
         Object.keys($(el).data()).forEach((key) => {
             const kebabKey = key.replace(
                 /[A-Z]/g,
-                (letter) => `-${letter.toLowerCase()}`
+                (letter) => `- ${letter.toLowerCase()}`
             );
-            $(el).removeAttr(`data-${kebabKey}`);
+            $(el).removeAttr(`data - ${kebabKey}`);
             //fallback
-            $(el).removeAttr(`data-${key}`);
+            $(el).removeAttr(`data - ${key}`);
         });
     });
 
