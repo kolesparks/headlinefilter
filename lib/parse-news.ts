@@ -18,35 +18,36 @@ export function parseNews(html: string) {
     const $ = cheerio.load(cleanedHtml);
     const articles: NewsArticle[] = [];
 
-    $("article").each((_, element) => {
+    const header = $("h1");
+
+    $("a").each((_, element) => {
         const $article = $(element);
-        const source = $article
-            .find("div:first-child")
-            .contents()
-            .first()
-            .text()
-            .trim()
-            .replaceAll("\n", " ")
-            .replace(/\s+/g, " ");
-        const rawLinkText = $article.find("a").text();
+        const isArticleLink = $article.next().is("time"); //if anchor is followed by time
+        if (!isArticleLink) {
+            return;
+        }
+        const source = $article.prev().contents().text().trim();
+        const rawLinkText = $article.text();
         const linkText = rawLinkText
             .trim()
             .replaceAll("\n", " ")
             .replace(/\s+/g, " ");
-        const timestamp = $article.find("time").attr("datetime") || "";
+        const timestamp = $article.next().attr("datetime") || "";
         const relativeTime = $article
-            .find("time")
+            .next()
             .text()
             .trim()
             .replaceAll("\n", " ")
             .replace(/\s+/g, " ");
         const author = $article
-            .find('span:contains("By ")')
-            .text()
-            .replace("By ", "")
-            .trim()
-            .replaceAll("\n", " ")
-            .replace(/\s+/g, " ");
+            .next()
+            .next().is("hr") && $article.next().next().next().is("span") ?
+            $article.next().next().next().contents().text()
+                .replace("By ", "")
+                .trim()
+                .replaceAll("\n", " ")
+                .replace(/\s+/g, " ") : "";
+
 
         articles.push({
             source,
@@ -92,10 +93,20 @@ function cleanHtml(html: string) {
     });
     // unnest divs
     $("div").each((_, el) => {
-        if ($(el).parent().is("div")) {
+        if ($(el).parent().is("div") &&
+            // exclude article source divs
+            !$(el).next().is("a")) {
             $(el).replaceWith($(el).contents());
         }
     });
+
+    // remove more divs
+    $("div").each((_, el) => {
+        if ($(el).contents().text().trim() === "More" || $(el).contents().text().startsWith("See more headlines")) {
+            $(el).remove()
+        }
+    });
+
     // remove empty spans
     $("span").each((_, el) => {
         if ($(el).text().trim() === "") {
@@ -153,6 +164,13 @@ function cleanHtml(html: string) {
             //fallback
             $(el).removeAttr(`data-${key}`);
         });
+    });
+
+    // remove empty anchors
+    $("a").each((_, el) => {
+        if ($(el).text().trim() === "") {
+            $(el).remove();
+        }
     });
 
     // Extract the body text

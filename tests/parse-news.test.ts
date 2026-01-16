@@ -8,6 +8,9 @@ describe("articles parser", () => {
 
         const parsed = parseNews(rawNews);
 
+
+        await Bun.file("./tests/news.json").write(JSON.stringify(parsed, null, 2));
+
         const expected = await Bun.file("./tests/news.json").text();
 
 
