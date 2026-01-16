@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Headline Filter</title>
+    <meta name="description" content="The news you want to see. No algorithm. No ads." />
+
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <main>
+
+        <header>
+            <h1>
+                The news you want to see - delivered to your inbox.
+            </h1>
+            <h2>
+                No algorithm. No Ads.
+            </h2>
+        </header>
+
+        <section id="search-section">
+            <form action="/search" method="get">
+                <label for="search">Describe what you want to see...</label>
+                <textarea id="search" name="search" placeholder=""></textarea>
+                <button type="submit">
+                    Search
+                </button>
+            </form>
+        </section>
+
+        <!--$EMAIL_ME_FORM-->
+
+        <section id="results-section">
+            <ol id="results-list">
+                <!--$RESULTS_LIST_ITEMS-->
+            </ol>
+        </section>
+
+    </main>
+</body>
+
+</html>
