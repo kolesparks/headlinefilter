@@ -1,7 +1,7 @@
 
 
-const landing = await Bun.file("./landing.html").text();
-const emailMeForm = await Bun.file("./email-me-form.html").text();
+const landing = await Bun.file("./html/landing.html").text();
+const emailMeForm = await Bun.file("./html/email-me-form.html").text();
 
 
 const port = process.env.PORT || 3000;
