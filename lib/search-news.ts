@@ -1,4 +1,4 @@
-import { filterNewsArticle } from "./filter-news";
+import { filterNewsArticle, filterNewsTopics } from "./filter-news";
 import { loadNews } from "./load-news";
 import type { NewsArticle } from "./parse-news";
 
@@ -12,7 +12,9 @@ export async function* searchNews(search: string, {
 
     let count = 0;
 
-    for await (const article of loadNews()) {
+    const { topics } = await filterNewsTopics(search);
+
+    for await (const article of loadNews(topics)) {
         if (articleBatch.length < concurrency) {
             articleBatch.push(article);
         } else {

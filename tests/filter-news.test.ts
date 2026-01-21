@@ -1,5 +1,5 @@
 import { describe, test, expect } from "bun:test";
-import { filterNewsArticle } from "../lib/filter-news";
+import { filterNewsArticle, filterNewsTopics } from "../lib/filter-news";
 
 
 const blackHoleArticle = {
@@ -22,3 +22,39 @@ describe("filter news", () => {
         expect(matches).toBeFalse();
     });
 });
+
+
+describe("filter topics", () => {
+    test("spaceship launches", async () => {
+        const { topics } = await filterNewsTopics("spaceship launches");
+        expect(topics).toMatchObject([
+            "science",
+            "technology",
+            "world",
+        ]);
+    });
+
+    test("christopher walken dies sad face", async () => {
+        const { topics } = await filterNewsTopics("christopher walken dies sad face");
+        expect(topics).toMatchObject([
+            "entertainment",
+            "world",
+        ]);
+    });
+
+
+    test("anything but politics", async () => {
+        const { topics } = await filterNewsTopics("anything but politics");
+        expect(topics).toMatchObject(
+            [
+                "world",
+                "business",
+                "technology",
+                "entertainment",
+                "sports",
+                "science",
+                "health",
+            ]
+        );
+    });
+})

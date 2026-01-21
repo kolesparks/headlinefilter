@@ -1,10 +1,10 @@
 import type { NewsArticle } from "./parse-news";
-import { NEWS_TOPICS_ARRAY, type NewsTopic } from "./scrape-news";
+import { type NewsTopic } from "./scrape-news";
 import { getNewsFilePath } from "./store-news";
 
 
-export async function* loadNews(): AsyncIterable<NewsArticle> {
-    for (const topic of NEWS_TOPICS_ARRAY) {
+export async function* loadNews(topics: NewsTopic[]): AsyncIterable<NewsArticle> {
+    for (const topic of topics) {
         const file = Bun.file(getNewsFilePath(topic));
         if (!(await file.exists())) {
             continue;

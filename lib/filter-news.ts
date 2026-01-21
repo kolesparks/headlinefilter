@@ -1,4 +1,5 @@
 import type { NewsArticle } from "./parse-news";
+import { NEWS_TOPICS_ARRAY, type NewsTopic } from "./scrape-news";
 
 
 
@@ -44,6 +45,9 @@ type OpenRouterResponse = {
 }
 
 
+
+
+
 export async function filterNewsArticle(article: NewsArticle, search: string) {
 
     const { relativeTime: _, linkHref: __, ...keyArticleDetails } = article;
@@ -80,4 +84,52 @@ export async function filterNewsArticle(article: NewsArticle, search: string) {
         },
         matches: openRouterResponse.choices[0]?.message.content.toLowerCase().includes("yes") ? true : false,
     }
+}
+
+
+export async function filterNewsTopics(search: string) {
+
+    const fetchResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            "model": "google/gemma-3n-e4b-it",
+            "messages": [
+
+                {
+                    "role": "system",
+                    "content": `Which of these topics should be included in this users search: ${NEWS_TOPICS_ARRAY.join(",")}? Answer with the topics separated by commas.`
+                },
+                {
+                    "role": "user",
+                    "content": search
+                }
+            ],
+            "temperature": 0.1,
+            "max_tokens": 300
+        })
+    });
+
+
+
+    const openRouterResponse = await fetchResponse.json() as unknown as OpenRouterResponse;
+
+
+    const parsed = openRouterResponse.choices[0]?.message.content
+        .trim()
+        .split(",")
+        .map((s) => s.trim().toLowerCase() as NewsTopic)
+        .filter((s) => NEWS_TOPICS_ARRAY.includes(s));
+
+
+    return {
+        topics: parsed || [],
+        meta: {
+            openRouterResponse,
+        }
+    }
+
 }
