@@ -1,4 +1,4 @@
 # headlinefilter
 
-The news you want. No algorithm. No Ads.
+News you asked for. No algorithm. No Ads.
 
