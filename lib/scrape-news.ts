@@ -1,22 +1,5 @@
 import { parseNews } from "./parse-news";
 
-export type NewsTopic = keyof typeof NEWS_TOPICS;
-
-export async function scrapeNews(topic: NewsTopic) {
-    if (!NEWS_TOPICS[topic]) {
-        throw new Error(`Invalid news topic: ${topic}`);
-    }
-    const url = `https://news.google.com/topics/${NEWS_TOPICS[topic].googleId}`;
-    const html = await scrapeUrl(url, {
-        steps: [
-            { click_and_wait_for_navigation: 'button[aria-label="Reject all"]' },
-        ],
-        render_js: true,
-    });
-
-    return parseNews(html);
-}
-
 export const NEWS_TOPICS = {
     world: {
         googleId: "CAAqJggKIiBDQkFTRWdvSUwyMHZNRGx1YlY4U0FtVnVHZ0pWVXlnQVAB",
@@ -43,6 +26,25 @@ export const NEWS_TOPICS = {
         googleId: "CAAqIQgKIhtDQkFTRGdvSUwyMHZNR3QwTlRFU0FtVnVLQUFQAQ",
     },
 };
+
+export type NewsTopic = keyof typeof NEWS_TOPICS;
+
+export const NEWS_TOPICS_ARRAY = Object.keys(NEWS_TOPICS) as NewsTopic[];
+
+export async function scrapeNews(topic: NewsTopic) {
+    if (!NEWS_TOPICS[topic]) {
+        throw new Error(`Invalid news topic: ${topic}`);
+    }
+    const url = `https://news.google.com/topics/${NEWS_TOPICS[topic].googleId}`;
+    const html = await scrapeUrl(url, {
+        steps: [
+            { click_and_wait_for_navigation: 'button[aria-label="Reject all"]' },
+        ],
+        render_js: true,
+    });
+
+    return parseNews(html);
+}
 
 async function scrapeUrl(
     url: string,

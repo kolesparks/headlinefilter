@@ -1,11 +1,11 @@
 import type { NewsArticle } from "./parse-news";
-import { NEWS_TOPICS } from "./scrape-news";
+import { NEWS_TOPICS_ARRAY, type NewsTopic } from "./scrape-news";
+import { getNewsFilePath } from "./store-news";
 
-const NEWS_TOPICS_ARRAY = Object.keys(NEWS_TOPICS);
+
 export async function* loadNews(): AsyncIterable<NewsArticle> {
-
     for (const topic of NEWS_TOPICS_ARRAY) {
-        const file = Bun.file(`data/news/${topic}.json`);
+        const file = Bun.file(getNewsFilePath(topic));
         if (!(await file.exists())) {
             continue;
         }
@@ -15,4 +15,8 @@ export async function* loadNews(): AsyncIterable<NewsArticle> {
             yield article;
         }
     }
+}
+
+export async function newsExists(topic: NewsTopic) {
+    return Bun.file(getNewsFilePath(topic)).exists();
 }

@@ -4,6 +4,8 @@ import Bun, { type BunRequest } from "bun";
 import { escapeHtml } from "./lib/escape-html";
 import { searchNews } from "./lib/search-news";
 import type { NewsArticle } from "./lib/parse-news";
+import { newsExists } from "./lib/load-news";
+import { runNewsJob } from "./lib/news-job";
 
 const landingHtml = await Bun.file("./html/landing.html").text();
 const emailMeFormHtml = await Bun.file("./html/email-me-form.html").text();
@@ -72,6 +74,18 @@ Bun.serve({
     },
     idleTimeout: 30
 });
+
+// run news job immediately if no data yet
+if (!(await newsExists("science"))) {
+    await runNewsJob();
+}
+
+setInterval(async () => {
+    await runNewsJob();
+},
+    1000 * 60 * 60 * 6 // every 6 hours
+);
+
 
 
 console.log(`Serving on http://${hostname}:${port}`);
