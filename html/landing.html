@@ -3,7 +3,7 @@
 
 <head>
     <title>Headline Filter</title>
-    <meta name="description" content="The news you want. No algorithm. No ads." />
+    <meta name="description" content="The news that matters to you." />
 
     <style>
 
@@ -15,7 +15,7 @@
 
         <header>
             <h1>
-                The news you want - delivered to your inbox.
+                The news that matters to you.
             </h1>
             <h2>
                 No algorithm. No Ads.
@@ -24,7 +24,7 @@
 
         <section id="search-section">
             <form method="get">
-                <label for="search">Describe what you want...</label>
+                <label for="search">Search</label>
                 <textarea id="search" name="search" placeholder="">$SEARCH</textarea>
                 <button type="submit">
                     Search
@@ -34,9 +34,9 @@
 
         $EMAIL_ME_FORM
 
-        <section id="results-section">
-            <ol id="results-list">
-                $RESULTS_LIST_ITEMS
+        <section id="results">
+            <ol id="news-articles">
+                $NEWS_ARTICLES
             </ol>
         </section>
 

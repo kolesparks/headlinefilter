@@ -46,6 +46,7 @@ type OpenRouterResponse = {
 
 export async function filterNewsArticle(article: NewsArticle, search: string) {
 
+    const { relativeTime: _, linkHref: __, ...keyArticleDetails } = article;
     const fetchResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -53,20 +54,23 @@ export async function filterNewsArticle(article: NewsArticle, search: string) {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            "model": "meta-llama/llama-3.2-3b-instruct",
+            "model": "google/gemma-3n-e4b-it",
             "messages": [
 
                 {
                     "role": "system",
-                    "content": `Answer the user with "yes" if the article matches the search term, otherwise say "no".`
+                    "content": `Should the article show up in results for the search term? Answer "yes" or "no".`
                 },
                 {
                     "role": "user",
-                    "content": `Article: ${JSON.stringify(article)} Search: "${search}"`
+                    "content": `====== ARTICLE ======\n"${JSON.stringify(keyArticleDetails)}"\n====== SEARCH ======\n"${search}"`
                 }
-            ]
+            ],
+            "temperature": 0.1,
+            "max_tokens": 50
         })
     });
+
 
 
     const openRouterResponse = await fetchResponse.json() as unknown as OpenRouterResponse;

@@ -2,21 +2,30 @@
 
 import Bun, { type BunRequest } from "bun";
 import { escapeHtml } from "./lib/escape-html";
-import { loadNews } from "./lib/load-news";
-import { filterNewsArticle } from "./lib/filter-news";
+import { searchNews } from "./lib/search-news";
+import type { NewsArticle } from "./lib/parse-news";
+
 const landingHtml = await Bun.file("./html/landing.html").text();
 const emailMeFormHtml = await Bun.file("./html/email-me-form.html").text();
-
+const newsArticleHtml = await Bun.file("./html/news-article.html").text();
 
 const port = process.env.PORT || 3000;
 const hostname = process.env.PORT ? "0.0.0.0" : "localhost";
 
-
-function renderLanding({ search, emailMeForm, resultsListItems }: { search: string, emailMeForm: string, resultsListItems: string }) {
+function renderLanding({ search, emailMeForm, newsArticles }: { search: string, emailMeForm: string, newsArticles: string }) {
     return landingHtml
         .replace("$SEARCH", escapeHtml(search))
         .replace("$EMAIL_ME_FORM", emailMeForm)
-        .replace("$RESULTS_LIST_ITEMS", resultsListItems);
+        .replace("$NEWS_ARTICLES", newsArticles);
+}
+
+function renderNewsArticle(article: NewsArticle) {
+    return newsArticleHtml
+        .replace("$LINK_HREF", escapeHtml(article.linkHref || ""))
+        .replace("$LINK_TEXT", escapeHtml(article.linkText))
+        .replace("$AUTHOR", escapeHtml(article.author))
+        .replace("$SOURCE", escapeHtml(article.source))
+        .replace("$TIMESTAMP", escapeHtml(article.timestamp))
 }
 
 Bun.serve({
@@ -31,7 +40,7 @@ Bun.serve({
             const search = url.searchParams.get("search");
 
             if (!search || typeof search !== "string") {
-                return new Response(renderLanding({ search: "", emailMeForm: "", resultsListItems: "" }), {
+                return new Response(renderLanding({ search: "", emailMeForm: "", newsArticles: "" }), {
                     headers: {
                         "Content-Type": "text/html"
                     }
@@ -42,16 +51,26 @@ Bun.serve({
                 return new Response("Search must be 1000 characters or less", { status: 400 });
             }
 
+            const stream = new ReadableStream({
+                start: async function (controller) {
+                    controller.enqueue(renderLanding({ search, emailMeForm: "", newsArticles: "" }).slice(0, landingHtml.indexOf("$NEWS_ARTICLES") + 1));
 
+                    for await (const article of searchNews(search, { concurrency: 10, limit: 25 })) {
+                        controller.enqueue(`<li>${renderNewsArticle(article)}</li>`);
+                    }
 
+                    controller.close();
+                }
+            });
 
-            return new Response(renderLanding({ search: search, emailMeForm: emailMeFormHtml, resultsListItems: "" }), {
+            return new Response(stream, {
                 headers: {
-                    "Content-Type": "text/html"
+                    "Content-Type": "text/html; charset=UTF-8"
                 }
             });
         },
-    }
+    },
+    idleTimeout: 30
 });
 
 
