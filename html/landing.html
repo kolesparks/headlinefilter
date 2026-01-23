@@ -6,6 +6,14 @@
     <meta name="description" content="The news that matters to you." />
 </head>
 
+
+<style>
+    input[id="search"] {
+        width: 200px;
+        height: 50px;
+    }
+</style>
+
 <body>
     <main>
 
@@ -21,14 +29,25 @@
         <section id="search-section">
             <form method="get">
                 <label for="search">Search</label>
-                <textarea id="search" name="search" placeholder="">$SEARCH</textarea>
+                <input id="search" name="search" type="text" list="search-suggestions" autocomplete="off" placeholder=""
+                    value="$SEARCH"></input>
+
+                <datalist id="search-suggestions">
+                    <option value="Movie box office record"></option>
+                    <option value="The start of World War III"></option>
+                    <option value="Only uplifting animal stories"></option>
+                    <option value="No politics"></option>
+                    <option value="No pop-science clickbait"></option>
+                    <option value="UFOs, Bigfoot, Sea Monsters"></option>
+                    <option value="Solved mystery"></option>
+                    <option value="Feel-good sports moments"></option>
+                </datalist>
                 <button type="submit">
                     Search
                 </button>
             </form>
         </section>
 
-        $EMAIL_ME_FORM
 
         <section id="results">
             <ol id="news-articles">
