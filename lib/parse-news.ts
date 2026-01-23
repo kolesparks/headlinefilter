@@ -49,7 +49,7 @@ export function parseNews(html: string) {
         articles.push({
             source,
             linkText,
-            linkHref: links.has(rawLinkText) ? `https://news.google.com/${links.get(rawLinkText)?.replace('./', '')}` : "",
+            linkHref: links.has(rawLinkText) ? links.get(rawLinkText)?.includes('./read') ? `https://news.google.com/${links.get(rawLinkText)?.replace('./', '')}` : links.get(rawLinkText) : "",
             timestamp,
             relativeTime,
             author,
