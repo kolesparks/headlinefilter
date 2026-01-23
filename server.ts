@@ -8,16 +8,14 @@ import { newsExists } from "./lib/load-news";
 import { runNewsJob } from "./lib/news-job";
 
 const landingHtml = await Bun.file("./html/landing.html").text();
-const emailMeFormHtml = await Bun.file("./html/email-me-form.html").text();
 const newsArticleHtml = await Bun.file("./html/news-article.html").text();
 
 const port = process.env.PORT || 3000;
 const hostname = process.env.PORT ? "0.0.0.0" : "localhost";
 
-function renderLanding({ search, emailMeForm, newsArticles }: { search: string, emailMeForm: string, newsArticles: string }) {
+function renderLanding({ search, newsArticles }: { search: string, newsArticles: string }) {
     return landingHtml
         .replace("$SEARCH", escapeHtml(search))
-        .replace("$EMAIL_ME_FORM", emailMeForm)
         .replace("$NEWS_ARTICLES", newsArticles);
 }
 
@@ -42,7 +40,7 @@ Bun.serve({
             const search = url.searchParams.get("search");
 
             if (!search || typeof search !== "string") {
-                return new Response(renderLanding({ search: "", emailMeForm: "", newsArticles: "" }), {
+                return new Response(renderLanding({ search: "", newsArticles: "" }), {
                     headers: {
                         "Content-Type": "text/html"
                     }
@@ -55,7 +53,7 @@ Bun.serve({
 
             const stream = new ReadableStream({
                 start: async function (controller) {
-                    controller.enqueue(renderLanding({ search, emailMeForm: "", newsArticles: "" }).slice(0, landingHtml.indexOf("$NEWS_ARTICLES") + 1));
+                    controller.enqueue(renderLanding({ search, newsArticles: "" }).slice(0, landingHtml.indexOf("$NEWS_ARTICLES") + 1));
 
                     for await (const article of searchNews(search, { concurrency: 10, limit: 25 })) {
                         controller.enqueue(`<li>${renderNewsArticle(article)}</li>`);
