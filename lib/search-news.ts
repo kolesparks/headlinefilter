@@ -10,7 +10,7 @@ export async function* searchNews(search: string, {
 
     let articleBatch: NewsArticle[] = [];
 
-    let count = 0;
+    let matchCount = 0;
 
     const { topics } = await filterNewsTopics(search);
 
@@ -21,13 +21,16 @@ export async function* searchNews(search: string, {
             const filterPromises = articleBatch.map((a, i) => filterNewsArticle(a, search).then((r) => ({ article: a, matches: r.matches, i })));
             for await (const result of createAnyOrderAsyncGenerator(filterPromises, (item) => item.i)) {
                 if (!result.matches) {
-                    continue;
+                    yield result;
+                } else {
+                    matchCount++;
+                    if (matchCount >= limit) {
+                        return result;
+                    } else {
+                        yield result;
+                    }
                 }
-                count++;
-                yield result.article;
-                if (count >= limit) {
-                    return;
-                }
+
             }
             articleBatch = [];
         }

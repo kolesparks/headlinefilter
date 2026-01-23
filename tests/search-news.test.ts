@@ -3,8 +3,9 @@ import { createAnyOrderAsyncGenerator, searchNews } from "../lib/search-news";
 
 describe("search news", () => {
     test("search", async () => {
-        const article = await searchNews("3D printing").next();
-        expect(article.value?.linkText.toLowerCase()).toInclude("3d-printed");
+        const result = await searchNews("3D printing").next();
+        expect(result.value?.matches).toBeTrue();
+        expect(result.value?.article?.linkText.toLowerCase()).toInclude("3d-printed");
     }, {
         timeout: 30_000
     });

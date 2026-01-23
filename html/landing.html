@@ -14,6 +14,7 @@
     }
 </style>
 
+
 <body>
     <main>
 
@@ -48,9 +49,39 @@
             </form>
         </section>
 
-
+        <h5 hidden>
+            Found <span id="found-count">0</span> out of <span id="article-count">0</span> articles
+        </h5>
         <section id="results">
+
+
+            <script>
+                // script needs to be placed here so it is executed after results section is loaded in the DOM
+                const observer = new MutationObserver((mutations) => {
+                    const articleCount = document.getElementById("article-count");
+                    const foundCount = document.getElementById("found-count");
+                    for (const mutation of mutations) {
+                        for (const node of mutation.addedNodes) {
+                            if (node.nodeType === node.ELEMENT_NODE && node.dataset && node.dataset["articleCount"]) {
+                                foundCount.parentElement.hidden = false;
+                                articleCount.textContent = node.dataset["articleCount"];
+                                foundCount.textContent = node.dataset["foundCount"];
+                            }
+                        }
+                    }
+                });
+
+                observer.observe(document.getElementById("results"), {
+                    childList: true,
+                    subtree: true,
+                });
+
+            </script>
+
             <ol id="news-articles">
+
+
+
                 $NEWS_ARTICLES
             </ol>
         </section>

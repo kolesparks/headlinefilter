@@ -55,8 +55,15 @@ Bun.serve({
                 start: async function (controller) {
                     controller.enqueue(renderLanding({ search, newsArticles: "" }).slice(0, landingHtml.indexOf("$NEWS_ARTICLES") + 1));
 
-                    for await (const article of searchNews(search, { concurrency: 10, limit: 25 })) {
-                        controller.enqueue(`<li>${renderNewsArticle(article)}</li>`);
+                    let articleCount = 0;
+                    let foundCount = 0;
+                    for await (const { matches, article } of searchNews(search, { concurrency: 10, limit: 25 })) {
+                        if (matches) {
+                            controller.enqueue(`<li>${renderNewsArticle(article)}</li>`);
+                            foundCount++;
+                        }
+                        articleCount++;
+                        controller.enqueue(`<span hidden data-article-count="${articleCount}" data-found-count="${foundCount}"></span>`)
                     }
 
                     controller.close();
