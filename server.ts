@@ -17,10 +17,11 @@ const hostname = process.env.PORT ? "0.0.0.0" : "localhost";
 
 const rateLimit = createRateLimit({ limit: 60, windowSeconds: 60 });
 
-function renderLanding({ search, newsArticles }: { search: string, newsArticles: string }) {
+function renderLanding({ search, newsArticles, metaDescription }: { search: string, newsArticles: string, metaDescription?: string }) {
     return landingHtml
         .replace("$SEARCH", escapeHtml(search))
-        .replace("$NEWS_ARTICLES", newsArticles);
+        .replace("$NEWS_ARTICLES", newsArticles)
+        .replace("$META_DESCRIPTION", escapeHtml(metaDescription || "News you ask for. No algorithm. No ads."));
 }
 
 function renderNewsArticle(article: NewsArticle) {
@@ -58,7 +59,7 @@ Bun.serve({
             const cachedNewsStoreRows = await loadNewsFromSearchCache(search);
 
             if (cachedNewsStoreRows) {
-                return new Response(renderLanding({ search, newsArticles: cachedNewsStoreRows.map((r) => `<li>${renderNewsArticle(r.article)}</li>`).join("\n") }), {
+                return new Response(renderLanding({ search, newsArticles: cachedNewsStoreRows.map((r) => `<li>${renderNewsArticle(r.article)}</li>`).join("\n"), metaDescription: search }), {
                     headers: {
                         "Content-Type": "text/html"
                     }
@@ -74,7 +75,7 @@ Bun.serve({
             const stream = new ReadableStream({
                 start: async function (controller) {
 
-                    const renderedLandingHtml = renderLanding({ search, newsArticles: "$NEWS_ARTICLES" });
+                    const renderedLandingHtml = renderLanding({ search, newsArticles: "$NEWS_ARTICLES", metaDescription: search });
                     const initialHtml = renderedLandingHtml.slice(0, renderedLandingHtml.indexOf("$NEWS_ARTICLES"));
                     controller.enqueue(initialHtml);
 
