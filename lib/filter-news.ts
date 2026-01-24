@@ -82,7 +82,7 @@ export async function filterNewsArticle(article: NewsArticle, search: string) {
         meta: {
             openRouterResponse,
         },
-        matches: openRouterResponse?.choices[0]?.message?.content?.toLowerCase().includes("yes") ? true : false,
+        matches: openRouterResponse?.choices?.[0]?.message?.content?.toLowerCase().includes("yes") ? true : false,
     }
 }
 
@@ -125,8 +125,9 @@ export async function filterNewsTopics(search: string) {
         .filter((s) => NEWS_TOPICS_ARRAY.includes(s));
 
 
+    const topics = parsed || [];
     return {
-        topics: parsed || [],
+        topics: topics.length > 0 ? topics : NEWS_TOPICS_ARRAY,
         meta: {
             openRouterResponse,
         }
