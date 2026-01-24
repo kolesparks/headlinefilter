@@ -3,7 +3,13 @@ import { type NewsTopic } from "./scrape-news";
 import { getNewsFilePath } from "./store-news";
 
 
-export async function* loadNews(topics: NewsTopic[]): AsyncIterable<NewsArticle> {
+export type NewsStoreRow = {
+    topic: NewsTopic;
+    article: NewsArticle;
+    index: number;
+}
+
+export async function* loadNews(topics: NewsTopic[]): AsyncIterable<NewsStoreRow> {
     for (const topic of topics) {
         const file = Bun.file(getNewsFilePath(topic));
         if (!(await file.exists())) {
@@ -11,8 +17,12 @@ export async function* loadNews(topics: NewsTopic[]): AsyncIterable<NewsArticle>
         }
         const articles = await file.json() as NewsArticle[];
 
-        for (const article of articles) {
-            yield article;
+        for (let i = 0; i < articles.length; i++) {
+            yield {
+                topic,
+                article: articles[i] as NewsArticle,
+                index: i
+            };
         }
     }
 }

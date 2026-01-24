@@ -5,7 +5,7 @@ describe("search news", () => {
     test("search", async () => {
         const result = await searchNews("3D printing").next();
         expect(result.value?.matches).toBeTrue();
-        expect(result.value?.article?.linkText.toLowerCase()).toInclude("3d-printed");
+        expect(result.value?.row.article?.linkText.toLowerCase()).toInclude("3d-printed");
     }, {
         timeout: 30_000
     });

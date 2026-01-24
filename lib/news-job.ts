@@ -1,5 +1,6 @@
 import { retryAsync } from "./retry-async";
 import { NEWS_TOPICS_ARRAY, scrapeNews } from "./scrape-news";
+import { clearSearchCache } from "./search-cache";
 import { storeNews } from "./store-news";
 
 export async function runNewsJob() {
@@ -18,6 +19,8 @@ export async function runNewsJob() {
             });
             await storeNews(topic, articles);
         }
+
+        await clearSearchCache();
 
         const t2 = Date.now();
 

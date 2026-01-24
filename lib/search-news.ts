@@ -1,5 +1,5 @@
 import { filterNewsArticle, filterNewsTopics } from "./filter-news";
-import { loadNews } from "./load-news";
+import { loadNews, type NewsStoreRow } from "./load-news";
 import type { NewsArticle } from "./parse-news";
 
 
@@ -8,31 +8,31 @@ export async function* searchNews(search: string, {
     limit = 100
 } = {}) {
 
-    let articleBatch: NewsArticle[] = [];
+    let rowBatch: NewsStoreRow[] = [];
 
     let matchCount = 0;
 
     const { topics } = await filterNewsTopics(search);
 
-    for await (const article of loadNews(topics)) {
-        if (articleBatch.length < concurrency) {
-            articleBatch.push(article);
+    for await (const row of loadNews(topics)) {
+        if (rowBatch.length < concurrency) {
+            rowBatch.push(row);
         } else {
-            const filterPromises = articleBatch.map((a, i) => filterNewsArticle(a, search).then((r) => ({ article: a, matches: r.matches, i })));
-            for await (const result of createAnyOrderAsyncGenerator(filterPromises, (item) => item.i)) {
-                if (!result.matches) {
-                    yield result;
+            const filterPromises = rowBatch.map((r, batchIndex) => filterNewsArticle(r.article, search).then((f) => ({ row: r, matches: f.matches, batchIndex })));
+            for await (const filterResult of createAnyOrderAsyncGenerator(filterPromises, (item) => item.batchIndex)) {
+                if (!filterResult.matches) {
+                    yield filterResult;
                 } else {
                     matchCount++;
                     if (matchCount >= limit) {
-                        return result;
+                        return filterResult;
                     } else {
-                        yield result;
+                        yield filterResult;
                     }
                 }
 
             }
-            articleBatch = [];
+            rowBatch = [];
         }
     }
 }

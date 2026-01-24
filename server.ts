@@ -4,8 +4,9 @@ import Bun, { type BunRequest } from "bun";
 import { escapeHtml } from "./lib/escape-html";
 import { searchNews } from "./lib/search-news";
 import type { NewsArticle } from "./lib/parse-news";
-import { newsExists } from "./lib/load-news";
+import { newsExists, type NewsStoreRow } from "./lib/load-news";
 import { runNewsJob } from "./lib/news-job";
+import { getSearchCache, loadNewsFromSearchCache, setSearchCache, type SearchCacheArticle } from "./lib/search-cache";
 
 const landingHtml = await Bun.file("./html/landing.html").text();
 const newsArticleHtml = await Bun.file("./html/news-article.html").text();
@@ -51,20 +52,37 @@ Bun.serve({
                 return new Response("Search must be 1000 characters or less", { status: 400 });
             }
 
+            const cachedNewsStoreRows = await loadNewsFromSearchCache(search);
+
+            if (cachedNewsStoreRows) {
+                return new Response(renderLanding({ search, newsArticles: cachedNewsStoreRows.map((r) => `<li>${renderNewsArticle(r.article)}</li>`).join("\n") }), {
+                    headers: {
+                        "Content-Type": "text/html"
+                    }
+                })
+            }
+
             const stream = new ReadableStream({
                 start: async function (controller) {
                     controller.enqueue(renderLanding({ search, newsArticles: "" }).slice(0, landingHtml.indexOf("$NEWS_ARTICLES") + 1));
 
                     let articleCount = 0;
                     let foundCount = 0;
-                    for await (const { matches, article } of searchNews(search, { concurrency: 10, limit: 25 })) {
+                    let searchCacheArticles: SearchCacheArticle[] = [];
+                    for await (const { matches, row } of searchNews(search, { concurrency: 10, limit: 25 })) {
                         if (matches) {
-                            controller.enqueue(`<li>${renderNewsArticle(article)}</li>`);
+                            controller.enqueue(`<li>${renderNewsArticle(row.article)}</li>`);
                             foundCount++;
+                            searchCacheArticles.push({
+                                index: row.index,
+                                topic: row.topic,
+                            });
                         }
                         articleCount++;
                         controller.enqueue(`<span hidden data-article-count="${articleCount}" data-found-count="${foundCount}"></span>`)
                     }
+
+                    await setSearchCache(search, searchCacheArticles);
 
                     controller.close();
                 }
