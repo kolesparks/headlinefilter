@@ -1,12 +1,12 @@
 
 
-import Bun, { type BunRequest } from "bun";
+import Bun from "bun";
 import { escapeHtml } from "./lib/escape-html";
 import { searchNews } from "./lib/search-news";
 import type { NewsArticle } from "./lib/parse-news";
-import { newsExists, type NewsStoreRow } from "./lib/load-news";
+import { newsExists } from "./lib/load-news";
 import { runNewsJob } from "./lib/news-job";
-import { getSearchCache, loadNewsFromSearchCache, setSearchCache, type SearchCacheArticle } from "./lib/search-cache";
+import { loadNewsFromSearchCache, setSearchCache, type SearchCacheArticle } from "./lib/search-cache";
 import { createRateLimit } from "./lib/rate-limit";
 
 const landingHtml = await Bun.file("./html/landing.html").text();
@@ -73,7 +73,10 @@ Bun.serve({
 
             const stream = new ReadableStream({
                 start: async function (controller) {
-                    controller.enqueue(renderLanding({ search, newsArticles: "" }).slice(0, landingHtml.indexOf("$NEWS_ARTICLES") + 1));
+
+                    const renderedLandingHtml = renderLanding({ search, newsArticles: "$NEWS_ARTICLES" });
+                    const initialHtml = renderedLandingHtml.slice(0, renderedLandingHtml.indexOf("$NEWS_ARTICLES"));
+                    controller.enqueue(initialHtml);
 
                     let articleCount = 0;
                     let foundCount = 0;

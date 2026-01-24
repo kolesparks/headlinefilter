@@ -277,6 +277,7 @@
                                 foundCount.parentElement.hidden = false;
                                 articleCount.textContent = node.dataset["articleCount"];
                                 foundCount.textContent = node.dataset["foundCount"];
+                                node.remove();
                             }
                         }
                     }
@@ -290,9 +291,6 @@
             </script>
 
             <ol id="news-articles">
-
-
-
                 $NEWS_ARTICLES
             </ol>
         </section>
