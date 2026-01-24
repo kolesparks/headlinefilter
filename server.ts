@@ -7,12 +7,15 @@ import type { NewsArticle } from "./lib/parse-news";
 import { newsExists, type NewsStoreRow } from "./lib/load-news";
 import { runNewsJob } from "./lib/news-job";
 import { getSearchCache, loadNewsFromSearchCache, setSearchCache, type SearchCacheArticle } from "./lib/search-cache";
+import { createRateLimit } from "./lib/rate-limit";
 
 const landingHtml = await Bun.file("./html/landing.html").text();
 const newsArticleHtml = await Bun.file("./html/news-article.html").text();
 
 const port = process.env.PORT || 3000;
 const hostname = process.env.PORT ? "0.0.0.0" : "localhost";
+
+const rateLimit = createRateLimit({ limit: 60, windowSeconds: 60 });
 
 function renderLanding({ search, newsArticles }: { search: string, newsArticles: string }) {
     return landingHtml
@@ -60,6 +63,12 @@ Bun.serve({
                         "Content-Type": "text/html"
                     }
                 })
+            }
+
+            const rateLimitHit = rateLimit();
+
+            if (rateLimitHit) {
+                return new Response("Too many requests", { status: 429 });
             }
 
             const stream = new ReadableStream({
