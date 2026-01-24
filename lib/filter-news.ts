@@ -82,7 +82,7 @@ export async function filterNewsArticle(article: NewsArticle, search: string) {
         meta: {
             openRouterResponse,
         },
-        matches: openRouterResponse.choices[0]?.message.content.toLowerCase().includes("yes") ? true : false,
+        matches: openRouterResponse?.choices[0]?.message?.content?.toLowerCase().includes("yes") ? true : false,
     }
 }
 

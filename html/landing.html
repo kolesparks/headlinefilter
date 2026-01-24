@@ -3,14 +3,137 @@
 
 <head>
     <title>Headline Filter</title>
-    <meta name="description" content="The news that matters to you." />
+    <meta name="description" content="News you ask for. No algorithm. No ads." />
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap"
+        rel="stylesheet">
+
 </head>
 
 
 <style>
-    input[id="search"] {
-        width: 300px;
-        height: 50px;
+    html {
+        font-family: "Google Sans", sans-serif;
+        font-optical-sizing: auto;
+        font-style: normal;
+        font-variation-settings:
+            "GRAD" 0;
+        overflow: hidden;
+        max-height: 100%;
+        height: 100%;
+    }
+
+    body {
+        overflow: hidden;
+        max-height: 100%;
+        height: 100%;
+    }
+
+    main {
+        overflow: hidden;
+        max-height: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+
+    header {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        align-items: center;
+        row-gap: 0px;
+        margin-bottom: 1em;
+    }
+
+    .hero {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        row-gap: 0px;
+    }
+
+    .hero h1 {
+        margin: 0.25em;
+    }
+
+    .hero h3 {
+        margin: 0.25em;
+    }
+
+    footer {
+        position: fixed;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: #FFF;
+    }
+
+    footer p {
+        position: relative;
+        font-size: 0.8em;
+        opacity: 0.84;
+        margin: 0.25em;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5em;
+        margin-bottom: 1em;
+    }
+
+
+    form input {
+        width: 80%;
+        max-width: 600px;
+        height: 40px;
+        margin: 0px;
+        border-radius: 5px;
+        border-width: 1px;
+    }
+
+    form button {
+        max-width: 600px;
+        width: 80%;
+        height: 25px;
+        border-radius: 5px;
+        border-width: 1px;
+        margin: 0px;
+    }
+
+
+    #results {
+        display: flex;
+        overflow: auto;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 2em;
+    }
+
+    h5 {
+        margin: 0.25em;
+    }
+
+    ol {
+        padding: 0px;
+        margin: 0px;
+    }
+
+    li {
+        border-width: 1px;
+        border-style: solid;
+        border-color: #000000;
+        border-radius: 5px;
+        margin-bottom: 0.5em;
+        padding: 0.75em;
+        list-style: none;
     }
 </style>
 
@@ -19,24 +142,26 @@
     <main>
 
         <header>
-            <div>
+            <div class="hero">
                 <h1>
                     Headline Filter
                 </h1>
-                <h2>
-                    News you asked for. No algorithm. No Ads. Free.
-                </h2>
-            </div>
-            <div>
-                Built by <a href="https://kolesparks.com" target="_blank">Kole Sparks</a>. Open Source on <a
-                    href="https://github.com/kolesparks/headlinefilter" target="_blank">GitHub</a>. Hosted on <a
-                    href="https://railway.com?referralCode=ABSfL6">Railway</a>.
+                <h3>
+                    News you ask for. No algorithm. No ads.
+                </h3>
             </div>
         </header>
 
+        <footer>
+            <p>
+                Built by <a href="https://kolesparks.com" target="_blank">Kole Sparks</a>. Open Source on <a
+                    href="https://github.com/kolesparks/headlinefilter" target="_blank">GitHub</a>. Hosted on <a
+                    href="https://railway.com?referralCode=ABSfL6">Railway</a>.
+            </p>
+        </footer>
+
         <section id="search-section">
             <form method="get">
-                <label for="search">Search</label>
                 <input id="search" name="search" type="text" list="search-suggestions" autocomplete="off" placeholder=""
                     value="$SEARCH"></input>
 
@@ -56,12 +181,12 @@
             </form>
         </section>
 
-        <h5 hidden>
-            Found <span id="found-count">0</span> out of <span id="article-count">0</span> articles
-        </h5>
+
         <section id="results">
 
-
+            <h5 hidden>
+                Found <span id="found-count">0</span> out of <span id="article-count">0</span> articles
+            </h5>
             <script>
                 // script needs to be placed here so it is executed after results section is loaded in the DOM
                 const observer = new MutationObserver((mutations) => {
