@@ -3,13 +3,33 @@
 
 <head>
     <title>Headline Filter</title>
+    <meta charset="UTF-8">
     <meta name="description" content="News you ask for. No algorithm. No ads." />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <link
         href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap"
         rel="stylesheet">
 
 </head>
+
+
+<script>
+    class KSFormattedTime extends HTMLElement {
+        static observedAttributes = ["color", "size"];
+
+        constructor() {
+            super();
+
+            requestAnimationFrame(() => {
+                const time = this.children.item(0);
+                time.textContent = new Date(time.textContent.trim()).toLocaleString();
+            });
+        }
+
+    }
+
+    customElements.define("ks-formatted-time", KSFormattedTime);
+</script>
 
 
 <style>
@@ -46,6 +66,7 @@
         align-items: center;
         row-gap: 0px;
         margin-bottom: 1em;
+        text-align: center;
     }
 
     .hero {
@@ -71,7 +92,7 @@
         bottom: 0;
         left: 0;
         right: 0;
-        background-color: #FFF;
+        text-align: center;
     }
 
     footer p {
@@ -96,18 +117,10 @@
         height: 40px;
         margin: 0px;
         border-radius: 5px;
-        border-width: 1px;
+        border: none;
+        font-size: 20px;
+        padding-left: 0.5em;
     }
-
-    form button {
-        max-width: 600px;
-        width: 80%;
-        height: 25px;
-        border-radius: 5px;
-        border-width: 1px;
-        margin: 0px;
-    }
-
 
     #results {
         display: flex;
@@ -129,11 +142,80 @@
     li {
         border-width: 1px;
         border-style: solid;
-        border-color: #000000;
+        border-color: #BCCCDC;
         border-radius: 5px;
         margin-bottom: 0.5em;
         padding: 0.75em;
         list-style: none;
+    }
+
+    a:visited {
+        color: #356499;
+        text-decoration: wavy;
+    }
+
+    a {
+        color: #437cbe;
+    }
+
+
+    @media (prefers-color-scheme: light) {
+
+        body {
+            background-color: #F8FAFC;
+            color: #222831;
+        }
+
+        input {
+            background-color: #D9EAFD;
+            color: #222831;
+
+        }
+
+        footer {
+            background-color: #BCCCDC;
+        }
+
+        a:visited {
+            color: #356499;
+            text-decoration: wavy;
+        }
+
+        a {
+            color: #437cbe;
+        }
+
+    }
+
+
+    @media (prefers-color-scheme: dark) {
+
+        body {
+            background-color: #222831;
+            color: #EEEEEE;
+        }
+
+        input {
+            background-color: #31363F;
+            color: #EEEEEE;
+        }
+
+        footer {
+            background: #31363F;
+        }
+
+        a:visited {
+            color: #76ABAE;
+        }
+
+        a {
+            color: #87c3c6;
+        }
+
+        li {
+            background-color: #31363F;
+            border: none;
+        }
     }
 </style>
 
@@ -154,7 +236,7 @@
 
         <footer>
             <p>
-                Built by <a href="https://kolesparks.com" target="_blank">Kole Sparks</a>. Open Source on <a
+                Hand crafted by <a href="https://kolesparks.com" target="_blank">Kole Sparks</a>. Open Source on <a
                     href="https://github.com/kolesparks/headlinefilter" target="_blank">GitHub</a>. Hosted on <a
                     href="https://railway.com?referralCode=ABSfL6">Railway</a>.
             </p>
@@ -162,8 +244,8 @@
 
         <section id="search-section">
             <form method="get">
-                <input id="search" name="search" type="text" list="search-suggestions" autocomplete="off" placeholder=""
-                    value="$SEARCH"></input>
+                <input id="search" name="search" type="text" list="search-suggestions" autocomplete="off"
+                    placeholder="Search anything" value="$SEARCH"></input>
 
                 <datalist id="search-suggestions">
                     <option value="Movie box office record"></option>
@@ -175,9 +257,6 @@
                     <option value="Solved mystery"></option>
                     <option value="Feel-good sports moments"></option>
                 </datalist>
-                <button type="submit">
-                    Search
-                </button>
             </form>
         </section>
 
