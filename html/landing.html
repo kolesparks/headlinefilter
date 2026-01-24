@@ -93,7 +93,7 @@
         left: 0;
         right: 0;
         text-align: center;
-        padding-bottom: env(safe-area-inset-bottom 1em);
+        padding-bottom: 1em;
     }
 
     footer p {
@@ -105,8 +105,9 @@
 
     form {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
+        justify-content: center;
         gap: 0.5em;
         margin-bottom: 1em;
     }
@@ -121,6 +122,15 @@
         border: none;
         font-size: 20px;
         padding-left: 0.5em;
+    }
+
+    form button {
+        height: 40px;
+        width: 40px;
+        border-radius: 5px;
+        border: none;
+        background-color: transparent;
+        cursor: pointer;
     }
 
     #results {
@@ -145,7 +155,7 @@
         border-style: solid;
         border-color: #BCCCDC;
         border-radius: 5px;
-        margin-bottom: env(safe-area-inset-bottom 1em);
+        margin-bottom: 2em;
         padding: 0.75em;
         list-style: none;
     }
@@ -167,10 +177,17 @@
             color: #222831;
         }
 
-        input {
+        form input {
             background-color: #D9EAFD;
             color: #222831;
+        }
 
+        form button {
+            background-color: #D9EAFD;
+        }
+
+        form button:hover {
+            background-color: #c6d5e6;
         }
 
         footer {
@@ -196,9 +213,17 @@
             color: #EEEEEE;
         }
 
-        input {
+        form input {
             background-color: #31363F;
             color: #EEEEEE;
+        }
+
+        form button {
+            background-color: #31363F;
+        }
+
+        form button:hover {
+            background-color: #3d434e;
         }
 
         footer {
@@ -247,6 +272,9 @@
             <form method="get">
                 <input id="search" name="search" type="text" list="search-suggestions" autocomplete="off"
                     placeholder="Search anything" value="$SEARCH"></input>
+                <button type="submit">
+                    🔍
+                </button>
 
                 <datalist id="search-suggestions">
                     <option value="Movie box office record"></option>
